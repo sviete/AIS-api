@@ -14,3 +14,15 @@ Look at the file `example.py` for a usage example.
 [travis]: https://travis-ci.org/sviete/ais-api
 [pypi]:https://pypi.org/project/ais-api/
 [pypi_badge]: https://badge.fury.io/py/ais-api.svg
+
+
+## Develop
+
+
+## Publish the new version to pip
+
+```bash
+rm -rf dist
+python3 setup.py sdist bdist_wheel
+twine upload dist/*
+```

@@ -4,8 +4,8 @@ import setuptools
 with open("README.md", "r") as fh:
     LONG = fh.read()
 setuptools.setup(
-    name="ais-api",
-    version="0.0.1",
+    name="aisapi",
+    version="0.0.3",
     author="AI-Speaker",
     author_email="info@ai-speaker.com",
     description="",

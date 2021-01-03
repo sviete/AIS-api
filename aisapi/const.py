@@ -10,4 +10,4 @@ AIS_WS_AUDIO_NAME_URL = (
 AIS_WS_AUDIOBOOKS_URL = "https://wolnelektury.pl/api/audiobooks/?format=json"
 AIS_WS_COMMAND_URL = "{ais_url}/command"
 AIS_WS_AUDIO_STATUS_URL = "{ais_url}/audio_status"
-AIS_WS_TTS_URL = "{ais_url}/text_to_speech/{text}"
+AIS_WS_TTS_URL = "{ais_url}/text_to_speech?text={text}"
