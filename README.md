@@ -12,8 +12,8 @@ Look at the file `example.py` for a usage example.
 
 [travis_status]: https://travis-ci.org/sviete/ais-api.svg?branch=master
 [travis]: https://travis-ci.org/sviete/ais-api
-[pypi]:https://pypi.org/project/ais-api/
-[pypi_badge]: https://badge.fury.io/py/ais-api.svg
+[pypi]:https://pypi.org/project/aisapi/
+[pypi_badge]: https://badge.fury.io/py/aisapi.svg
 
 
 ## Develop
