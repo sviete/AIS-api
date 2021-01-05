@@ -10,13 +10,18 @@ pip install aisapi
 
 Look at the file `example.py` for a usage example.
 
-[travis_status]: https://travis-ci.org/sviete/ais-api.svg?branch=master
+[travis_status]: https://travis-ci.org/sviete/AIS-api.svg?branch=master
 [travis]: https://travis-ci.org/sviete/ais-api
 [pypi]:https://pypi.org/project/aisapi/
 [pypi_badge]: https://badge.fury.io/py/aisapi.svg
 
 
 ## Develop
+
+```bash
+git clone https://github.com/sviete/AIS-api.git
+
+```
 
 
 ## Publish the new version to pip

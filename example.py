@@ -3,7 +3,7 @@ import asyncio
 import aiohttp
 from aisapi.ws import AisWebService
 
-AIS_WS_URL = 'http://ais-dom.local:8122'
+AIS_WS_URL = "http://ais-dom.local:8122"
 
 
 async def get_gate_info_example():
@@ -69,6 +69,7 @@ async def send_command_example2():
         value = True
         ais_answer = await ais_ws.command(command, value)
         print("AIS answer:", ais_answer)
+
 
 LOOP = asyncio.get_event_loop()
 LOOP.run_until_complete(get_gate_info_example())

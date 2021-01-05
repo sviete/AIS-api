@@ -10,9 +10,13 @@ import socket
 import aiohttp
 import async_timeout
 from .const import (
-    AIS_WS_TTS_URL, AIS_WS_COMMAND_URL, AIS_WS_AUDIO_STATUS_URL,
-    AIS_WS_AUDIO_TYPE_URL, AIS_WS_AUDIO_NAME_URL, AIS_WS_AUDIOBOOKS_URL,
-    AIS_WS_TUNE_IN_URL
+    AIS_WS_TTS_URL,
+    AIS_WS_COMMAND_URL,
+    AIS_WS_AUDIO_STATUS_URL,
+    AIS_WS_AUDIO_TYPE_URL,
+    AIS_WS_AUDIO_NAME_URL,
+    AIS_WS_AUDIOBOOKS_URL,
+    AIS_WS_TUNE_IN_URL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -48,6 +52,8 @@ class AisWebService(object):
                             self._api_key = result.get("gate_id")
                         else:
                             self._api_key = result.get("ais_gate_client_id")
+                        if "NetworkSpeed" not in result:
+                            result["NetworkSpeed"] = 0
                         self._gate_info = result
                         self._gate_info["ais_id"] = self._api_key
                         self._gate_info["ais_url"] = self._ais_ws_url
@@ -56,9 +62,9 @@ class AisWebService(object):
                     else:
                         _LOGGER.error("Error code %s ", response.status)
                 except (TypeError, KeyError) as error:
-                    _LOGGER.error('Error parsing data from AIS, %s', error)
+                    _LOGGER.error("Error parsing data from AIS, %s", error)
         except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
-            _LOGGER.error('Error connecting to AIS, %s', error)
+            _LOGGER.error("Error connecting to AIS, %s", error)
         return None
 
     async def say_it(self, text):
@@ -74,9 +80,9 @@ class AisWebService(object):
                     else:
                         _LOGGER.error("Error code %s ", response.status)
                 except (TypeError, KeyError) as error:
-                    _LOGGER.error('Error parsing data from AIS, %s', error)
+                    _LOGGER.error("Error parsing data from AIS, %s", error)
         except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
-            _LOGGER.error('Error connecting to AIS, %s', error)
+            _LOGGER.error("Error connecting to AIS, %s", error)
         return ""
 
     async def command(self, command, value):
@@ -85,7 +91,9 @@ class AisWebService(object):
         requests_json = {command: value}
         try:
             async with async_timeout.timeout(8, loop=self._loop):
-                response = await self._session.post(url, json=requests_json, headers=self._headers)
+                response = await self._session.post(
+                    url, json=requests_json, headers=self._headers
+                )
                 result = await response.text()
                 try:
                     if response.status == 200:
@@ -93,9 +101,9 @@ class AisWebService(object):
                     else:
                         _LOGGER.error("Error code %s ", response.status)
                 except (TypeError, KeyError) as error:
-                    _LOGGER.error('Error parsing data from AIS, %s', error)
+                    _LOGGER.error("Error parsing data from AIS, %s", error)
         except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
-            _LOGGER.error('Error connecting to AIS, %s', error)
+            _LOGGER.error("Error connecting to AIS, %s", error)
         return ""
 
     async def get_audio_status(self):
@@ -111,9 +119,9 @@ class AisWebService(object):
                     else:
                         _LOGGER.error("Error code %s ", response.status)
                 except (TypeError, KeyError) as error:
-                    _LOGGER.error('Error parsing data from AIS, %s', error)
+                    _LOGGER.error("Error parsing data from AIS, %s", error)
         except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
-            _LOGGER.error('Error connecting to AIS, %s', error)
+            _LOGGER.error("Error connecting to AIS, %s", error)
         return self._audio_info
 
     async def get_audio_type(self, media_content_id):
@@ -138,18 +146,22 @@ class AisWebService(object):
                     else:
                         _LOGGER.error("Error code %s ", response.status)
                 except (TypeError, KeyError) as error:
-                    _LOGGER.error('Error parsing data from AIS, %s', error)
+                    _LOGGER.error("Error parsing data from AIS, %s", error)
         except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
-            _LOGGER.error('Error connecting to AIS, %s', error)
+            _LOGGER.error("Error connecting to AIS, %s", error)
         return None
 
     async def get_audio_name(self, media_content_id):
         if media_content_id.startswith("ais_radio"):
-            ais_rest_url = AIS_WS_AUDIO_NAME_URL.format(audio_nature="Radio",
-                                                        audio_type=media_content_id.replace("ais_radio/", ""))
+            ais_rest_url = AIS_WS_AUDIO_NAME_URL.format(
+                audio_nature="Radio",
+                audio_type=media_content_id.replace("ais_radio/", ""),
+            )
         elif media_content_id.startswith("ais_podcast"):
-            ais_rest_url = AIS_WS_AUDIO_NAME_URL.format(audio_nature="Podcast",
-                                                        audio_type=media_content_id.replace("ais_podcast/", ""))
+            ais_rest_url = AIS_WS_AUDIO_NAME_URL.format(
+                audio_nature="Podcast",
+                audio_type=media_content_id.replace("ais_podcast/", ""),
+            )
         elif media_content_id.startswith("ais_audio_books"):
             ais_rest_url = media_content_id.split("/", 3)[3] + "?format=json"
         elif media_content_id.startswith("ais_tunein"):
@@ -168,9 +180,9 @@ class AisWebService(object):
                     else:
                         _LOGGER.error("Error code %s ", response.status)
                 except (TypeError, KeyError) as error:
-                    _LOGGER.error('Error parsing data from AIS, %s', error)
+                    _LOGGER.error("Error parsing data from AIS, %s", error)
         except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
-            _LOGGER.error('Error connecting to AIS, %s', error)
+            _LOGGER.error("Error connecting to AIS, %s", error)
         return None
 
     async def get_podcast_tracks(self, media_content_id):
@@ -185,9 +197,9 @@ class AisWebService(object):
                     else:
                         _LOGGER.error("Error code %s ", response.status)
                 except (TypeError, KeyError) as error:
-                    _LOGGER.error('Error parsing data from AIS, %s', error)
+                    _LOGGER.error("Error parsing data from AIS, %s", error)
         except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
-                _LOGGER.error('Error connecting to AIS, %s', error)
+            _LOGGER.error("Error connecting to AIS, %s", error)
         return None
 
     # TODO
