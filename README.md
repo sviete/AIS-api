@@ -5,7 +5,7 @@ _Python wrapper package for the AIS API._
 ## Install
 
 ```bash
-pip install ais-api
+pip install aisapi
 ```
 
 Look at the file `example.py` for a usage example.
