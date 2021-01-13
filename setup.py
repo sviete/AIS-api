@@ -5,12 +5,12 @@ with open("README.md", "r") as fh:
     LONG = fh.read()
 setuptools.setup(
     name="aisapi",
-    version="0.0.4",
+    version="0.0.5",
     author="AI-Speaker",
     author_email="info@ai-speaker.com",
     description="",
     long_description=LONG,
-    install_requires=['aiohttp', 'async_timeout'],
+    install_requires=["aiohttp", "async_timeout"],
     long_description_content_type="text/markdown",
     url="https://github.com/sviete/AIS-api",
     packages=setuptools.find_packages(),

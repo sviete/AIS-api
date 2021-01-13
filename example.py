@@ -46,8 +46,8 @@ async def get_audio_type_example():
         ais_ws = AisWebService(LOOP, session, AIS_WS_URL)
         # media_content_id = "ais_radio"
         # media_content_id = "ais_podcast"
-        # media_content_id = "ais_audio_books"
-        media_content_id = "ais_tunein"
+        media_content_id = "ais_audio_books"
+        # media_content_id = "ais_tunein"
         ais_answer = await ais_ws.get_audio_type(media_content_id)
         print("AIS answer:", ais_answer)
 

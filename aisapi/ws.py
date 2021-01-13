@@ -27,7 +27,7 @@ class AisWebService(object):
 
     def __init__(self, loop, session, ais_host):
         """Initialize the class."""
-        self._loop = loop
+        self._loop = asyncio.get_event_loop()
         self._session = session
         self._ais_ws_url = ais_host
         if not self._ais_ws_url.startswith("http"):
@@ -57,7 +57,12 @@ class AisWebService(object):
                         self._gate_info = result
                         self._gate_info["ais_id"] = self._api_key
                         self._gate_info["ais_url"] = self._ais_ws_url
-                        self._headers = {"Authorization": self._api_key}
+                        self._headers = {
+                            # No Authorization to work with books and tune in
+                            # "Authorization": self._api_key,
+                            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_4) AppleWebKit/537.36 (KHTML, "
+                            "like Gecko) Chrome/75.0.3770.100 Safari/537.36"
+                        }
                         return self._gate_info
                     else:
                         _LOGGER.error("Error code %s ", response.status)
@@ -134,19 +139,19 @@ class AisWebService(object):
         elif media_content_id == "ais_tunein":
             ais_rest_url = AIS_WS_TUNE_IN_URL
         try:
-            async with async_timeout.timeout(8, loop=self._loop):
+            async with async_timeout.timeout(10, loop=self._loop):
                 response = await self._session.get(ais_rest_url, headers=self._headers)
-                if media_content_id == "ais_tunein":
-                    result = await response.text()
+                if response.status == 200:
+                    try:
+                        if media_content_id in "ais_tunein":
+                            result = await response.text()
+                        else:
+                            result = await response.json()
+                    except (TypeError, KeyError) as error:
+                        _LOGGER.error("Error parsing data from AIS, %s", error)
+                    return result
                 else:
-                    result = await response.json()
-                try:
-                    if response.status == 200:
-                        return result
-                    else:
-                        _LOGGER.error("Error code %s ", response.status)
-                except (TypeError, KeyError) as error:
-                    _LOGGER.error("Error parsing data from AIS, %s", error)
+                    _LOGGER.error("Error code %s ", response.status)
         except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
             _LOGGER.error("Error connecting to AIS, %s", error)
         return None
@@ -202,21 +207,21 @@ class AisWebService(object):
             _LOGGER.error("Error connecting to AIS, %s", error)
         return None
 
-    # TODO
-    async def async_get_media_content_id_form_ais(media_content_id, web_session):
+    # Get media content id from AIS
+    async def get_media_content_id_form_ais(self, media_content_id):
         """Get media content from ais."""
-        response_text = ""
+        response_text = media_content_id
         if media_content_id.startswith("ais_tunein"):
             rest_url = media_content_id.split("/", 3)[3]
-            ws_resp = await web_session.get(rest_url, timeout=7)
+            ws_resp = await self._session.get(rest_url, timeout=7)
             response_text = await ws_resp.text()
             response_text = response_text.split("\n")[0]
             if response_text.endswith(".pls"):
-                ws_resp = await web_session.get(response_text, timeout=7)
+                ws_resp = await self._session.get(response_text, timeout=7)
                 response_text = await ws_resp.text()
                 response_text = response_text.split("\n")[1].replace("File1=", "")
             if response_text.startswith("mms:"):
-                ws_resp = await web_session.get(
+                ws_resp = await self._session.get(
                     response_text.replace("mms:", "http:"), timeout=7
                 )
                 response_text = await ws_resp.text()
