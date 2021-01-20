@@ -17,6 +17,7 @@ from .const import (
     AIS_WS_AUDIO_NAME_URL,
     AIS_WS_AUDIOBOOKS_URL,
     AIS_WS_TUNE_IN_URL,
+    AIS_WS_AUDIO_INFO,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -39,6 +40,7 @@ class AisWebService(object):
         self._headers = None
         self._audio_info = None
         self._audiobooks_lib = None
+        self._browse_media = None
 
     async def get_gate_info(self):
         """Return the information about gate."""
@@ -206,6 +208,18 @@ class AisWebService(object):
         except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
             _LOGGER.error("Error connecting to AIS, %s", error)
         return None
+
+    # save media in cache
+    async def cache_browse_media(self, media):
+        self._browse_media = media
+        # TODO
+        print(media)
+        for items in self._browse_media:
+            print(items)
+            # if items.get("can_play") is True:
+            #     print("can_play")
+            # else:
+            #     print("NO play")
 
     # Get media content id from AIS
     async def get_media_content_id_form_ais(self, media_content_id):
