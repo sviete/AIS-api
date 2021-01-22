@@ -40,7 +40,7 @@ class AisWebService(object):
         self._headers = None
         self._audio_info = None
         self._audiobooks_lib = None
-        self._browse_media = []
+        self._browse_media = None
 
     async def get_gate_info(self):
         """Return the information about gate."""
@@ -241,24 +241,25 @@ class AisWebService(object):
         """Get media content from ais."""
         j_media_info = None
         # share_media_full_info with info from cache
-        if self._browse_media.get("media_content_id") == media_content_id:
-            j_media_info = {
-                "media_title": self._browse_media.get("title"),
-                "media_source": self._browse_media.get("title"),
-                "media_stream_image": self._browse_media.get("thumbnail"),
-                "media_album_name": self._browse_media.get("media_class"),
-            }
-        else:
-            if "children" in self._browse_media:
-                for item in self._browse_media["children"]:
-                    if item.get("media_content_id") == media_content_id:
-                        j_media_info = {
-                            "media_title": item.get("title"),
-                            "media_source": item.get("title"),
-                            "media_stream_image": item.get("thumbnail"),
-                            "media_album_name": item.get("media_class"),
-                        }
-                        break
+        if self._browse_media is not None:
+            if self._browse_media.get("media_content_id") == media_content_id:
+                j_media_info = {
+                    "media_title": self._browse_media.get("title"),
+                    "media_source": self._browse_media.get("title"),
+                    "media_stream_image": self._browse_media.get("thumbnail"),
+                    "media_album_name": self._browse_media.get("media_class"),
+                }
+            else:
+                if "children" in self._browse_media:
+                    for item in self._browse_media["children"]:
+                        if item.get("media_content_id") == media_content_id:
+                            j_media_info = {
+                                "media_title": item.get("title"),
+                                "media_source": item.get("title"),
+                                "media_stream_image": item.get("thumbnail"),
+                                "media_album_name": item.get("media_class"),
+                            }
+                            break
 
         response_text = media_content_id
         if media_content_id.startswith("ais_tunein"):
