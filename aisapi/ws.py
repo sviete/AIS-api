@@ -40,7 +40,7 @@ class AisWebService(object):
         self._headers = None
         self._audio_info = None
         self._audiobooks_lib = None
-        self._browse_media = None
+        self._browse_media = []
 
     async def get_gate_info(self):
         """Return the information about gate."""
@@ -209,21 +209,57 @@ class AisWebService(object):
             _LOGGER.error("Error connecting to AIS, %s", error)
         return None
 
-    # save media in cache
+    # save media in local cache
     async def cache_browse_media(self, media):
         self._browse_media = media
-        # TODO
-        print(media)
-        for items in self._browse_media:
-            print(items)
-            # if items.get("can_play") is True:
-            #     print("can_play")
-            # else:
-            #     print("NO play")
 
-    # Get media content id from AIS
+    def share_media_full_info(self, media):
+        """Share media info between ais clients."""
+        try:
+            import requests
+            requests.post(AIS_WS_AUDIO_INFO, headers=self._headers, json=media, timeout=2)
+        except Exception as error:
+            _LOGGER.debug("Error connecting to AIS, %s", error)
+
+    async def async_share_media_full_info(self, media):
+        """Share media info between ais clients."""
+        try:
+            async with async_timeout.timeout(8, loop=self._loop):
+                response = await self._session.post(AIS_WS_AUDIO_INFO, headers=self._headers, json=media)
+                result = await response.json()
+                try:
+                    if response.status == 200:
+                        return result
+                    else:
+                        _LOGGER.debug("Error code %s ", response.status)
+                except (TypeError, KeyError) as error:
+                    _LOGGER.debug("Error parsing data from AIS, %s", error)
+        except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
+            _LOGGER.debug("Error connecting to AIS, %s", error)
+
     async def get_media_content_id_form_ais(self, media_content_id):
         """Get media content from ais."""
+        j_media_info = None
+        # share_media_full_info with info from cache
+        if self._browse_media.get("media_content_id") == media_content_id:
+            j_media_info = {
+                "media_title": self._browse_media.get("title"),
+                "media_source": self._browse_media.get("title"),
+                "media_stream_image": self._browse_media.get("thumbnail"),
+                "media_album_name": self._browse_media.get("media_class"),
+            }
+        else:
+            if "children" in self._browse_media:
+                for item in self._browse_media["children"]:
+                    if item.get("media_content_id") == media_content_id:
+                        j_media_info = {
+                            "media_title": item.get("title"),
+                            "media_source": item.get("title"),
+                            "media_stream_image": item.get("thumbnail"),
+                            "media_album_name": item.get("media_class"),
+                        }
+                        break
+
         response_text = media_content_id
         if media_content_id.startswith("ais_tunein"):
             rest_url = media_content_id.split("/", 3)[3]
@@ -242,6 +278,10 @@ class AisWebService(object):
                 response_text = response_text.split("\n")[1].replace("Ref1=", "")
         elif media_content_id.startswith("ais_spotify"):
             response_text = media_content_id.replace("ais_spotify/", "")
+
+        if j_media_info:
+            j_media_info["media_content_id"] = response_text
+            await self.async_share_media_full_info(j_media_info)
         return response_text
 
     @property
