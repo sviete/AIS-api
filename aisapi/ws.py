@@ -242,12 +242,14 @@ class AisWebService(object):
         except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
             _LOGGER.debug("Error connecting to AIS, %s", error)
 
-    async def async_redirect_camera_stream(self, stream_source, speaker_ws_url):
+    async def async_redirect_camera_stream(
+        self, speaker_ws_url, stream_source, ha_cam_id
+    ):
         """Share media info between ais clients."""
         try:
             async with async_timeout.timeout(8, loop=self._loop):
                 requests_json = {
-                    "showCamera": {"streamUrl": stream_source, "openAutomationName": ""}
+                    "showCamera": {"streamUrl": stream_source, "haCamId": ha_cam_id}
                 }
                 response = await self._session.post(
                     AIS_WS_COMMAND_URL.format(ais_url=speaker_ws_url),
