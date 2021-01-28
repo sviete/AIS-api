@@ -217,7 +217,10 @@ class AisWebService(object):
         """Share media info between ais clients."""
         try:
             import requests
-            requests.post(AIS_WS_AUDIO_INFO, headers=self._headers, json=media, timeout=2)
+
+            requests.post(
+                AIS_WS_AUDIO_INFO, headers=self._headers, json=media, timeout=2
+            )
         except Exception as error:
             _LOGGER.debug("Error connecting to AIS, %s", error)
 
@@ -225,7 +228,32 @@ class AisWebService(object):
         """Share media info between ais clients."""
         try:
             async with async_timeout.timeout(8, loop=self._loop):
-                response = await self._session.post(AIS_WS_AUDIO_INFO, headers=self._headers, json=media)
+                response = await self._session.post(
+                    AIS_WS_AUDIO_INFO, headers=self._headers, json=media
+                )
+                result = await response.json()
+                try:
+                    if response.status == 200:
+                        return result
+                    else:
+                        _LOGGER.debug("Error code %s ", response.status)
+                except (TypeError, KeyError) as error:
+                    _LOGGER.debug("Error parsing data from AIS, %s", error)
+        except (asyncio.TimeoutError, aiohttp.ClientError, socket.gaierror) as error:
+            _LOGGER.debug("Error connecting to AIS, %s", error)
+
+    async def async_redirect_camera_stream(self, stream_source, speaker_ws_url):
+        """Share media info between ais clients."""
+        try:
+            async with async_timeout.timeout(8, loop=self._loop):
+                requests_json = {
+                    "showCamera": {"streamUrl": stream_source, "openAutomationName": ""}
+                }
+                response = await self._session.post(
+                    AIS_WS_COMMAND_URL.format(ais_url=speaker_ws_url),
+                    headers=self._headers,
+                    json=requests_json,
+                )
                 result = await response.json()
                 try:
                     if response.status == 200:
