@@ -26,9 +26,9 @@ _LOGGER = logging.getLogger(__name__)
 class AisWebService(object):
     """A class for the AIS WS API."""
 
-    def __init__(self, loop, session, ais_host):
+    def __init__(self, session, ais_host):
         """Initialize the class."""
-        self._loop = asyncio.get_event_loop()
+        self._loop = asyncio.get_running_loop()
         self._session = session
         self._ais_ws_url = ais_host
         if not self._ais_ws_url.startswith("http"):
