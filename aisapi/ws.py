@@ -45,7 +45,7 @@ class AisWebService(object):
     async def get_gate_info(self):
         """Return the information about gate."""
         try:
-            async with async_timeout.timeout(8, loop=self._loop):
+            async with async_timeout.timeout(8):
                 response = await self._session.get(self._ais_ws_url)
                 result = await response.json()
                 try:
@@ -78,7 +78,7 @@ class AisWebService(object):
         """Get tracking information."""
         url = AIS_WS_TTS_URL.format(ais_url=self._ais_ws_url, text=text)
         try:
-            async with async_timeout.timeout(8, loop=self._loop):
+            async with async_timeout.timeout(8):
                 response = await self._session.get(url, headers=self._headers)
                 result = await response.text()
                 try:
@@ -97,7 +97,7 @@ class AisWebService(object):
         url = AIS_WS_COMMAND_URL.format(ais_url=self._ais_ws_url)
         requests_json = {command: value}
         try:
-            async with async_timeout.timeout(8, loop=self._loop):
+            async with async_timeout.timeout(8):
                 response = await self._session.post(
                     url, json=requests_json, headers=self._headers
                 )
@@ -117,7 +117,7 @@ class AisWebService(object):
         """Get the audio status from AI-Speaker."""
         url = AIS_WS_AUDIO_STATUS_URL.format(ais_url=self._ais_ws_url)
         try:
-            async with async_timeout.timeout(8, loop=self._loop):
+            async with async_timeout.timeout(8):
                 response = await self._session.get(url)
                 result = await response.json()
                 try:
@@ -141,7 +141,7 @@ class AisWebService(object):
         elif media_content_id == "ais_tunein":
             ais_rest_url = AIS_WS_TUNE_IN_URL
         try:
-            async with async_timeout.timeout(10, loop=self._loop):
+            async with async_timeout.timeout(10):
                 response = await self._session.get(ais_rest_url, headers=self._headers)
                 if response.status == 200:
                     try:
@@ -174,7 +174,7 @@ class AisWebService(object):
         elif media_content_id.startswith("ais_tunein"):
             ais_rest_url = media_content_id.split("/", 3)[3]
         try:
-            async with async_timeout.timeout(8, loop=self._loop):
+            async with async_timeout.timeout(8):
                 response = await self._session.get(ais_rest_url, headers=self._headers)
 
                 if media_content_id.startswith("ais_tunein"):
@@ -195,7 +195,7 @@ class AisWebService(object):
     async def get_podcast_tracks(self, media_content_id):
         lookup_url = media_content_id.split("/", 3)[3]
         try:
-            async with async_timeout.timeout(8, loop=self._loop):
+            async with async_timeout.timeout(8):
                 response = await self._session.get(lookup_url)
                 result = await response.text()
                 try:
@@ -227,7 +227,7 @@ class AisWebService(object):
     async def async_share_media_full_info(self, media):
         """Share media info between ais clients."""
         try:
-            async with async_timeout.timeout(8, loop=self._loop):
+            async with async_timeout.timeout(8):
                 response = await self._session.post(
                     AIS_WS_AUDIO_INFO, headers=self._headers, json=media
                 )
@@ -247,7 +247,7 @@ class AisWebService(object):
     ):
         """Share media info between ais clients."""
         try:
-            async with async_timeout.timeout(8, loop=self._loop):
+            async with async_timeout.timeout(8):
                 requests_json = {
                     "showCamera": {"streamUrl": stream_source, "haCamId": ha_cam_id}
                 }

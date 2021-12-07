@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
     LONG = fh.read()
 setuptools.setup(
     name="aisapi",
-    version="0.1.0",
+    version="0.1.1",
     author="AI-Speaker",
     author_email="info@ai-speaker.com",
     description="",
